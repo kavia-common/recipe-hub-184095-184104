@@ -103,6 +103,27 @@
   .grid-item-3 { grid-column: span 3; }
 }
 
+/* Filter panel tweaks */
+.card h2 {
+  color: var(--text);
+}
+.card .input {
+  background: var(--surface);
+}
+.card .btn.secondary {
+  border-color: var(--border);
+}
+
+/* Simple two-column layout helper if needed later */
+@media(min-width: 1024px) {
+  .layout-with-sidebar {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+}
+
 /* Navigation & Footer */
 .navbar {
   background: var(--surface);
