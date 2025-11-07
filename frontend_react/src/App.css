@@ -1,30 +1,45 @@
 /* Ocean Professional Theme Variables */
 :root {
+  /* Core palette */
   --primary: #374151; /* slate-700 */
+  --primary-contrast: #ffffff;
   --secondary: #9CA3AF; /* gray-400 */
   --success: #10B981; /* emerald-500 */
   --error: #EF4444; /* red-500 */
+
+  /* Surfaces & text */
   --background: #FFFFFF;
   --surface: #F9FAFB;
   --text: #111827; /* gray-900 */
-  --muted: #6B7280; /* gray-500 */
+  --muted: #4B5563; /* gray-600 for better contrast on light */
   --border: #E5E7EB; /* gray-200 */
 
+  /* Focus / rings */
+  --ring: rgba(55,65,81,0.25); /* primary at ~25% */
+  --ring-strong: rgba(55,65,81,0.4);
+
+  /* Radii & shadows */
   --radius: 12px;
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 [data-theme="dark"] {
+  /* Keep brand hue but ensure contrast on dark */
   --primary: #93C5FD; /* light blue accent */
+  --primary-contrast: #0B1220; /* deep ocean background for contrast text when needed */
   --secondary: #9CA3AF;
   --success: #34D399;
   --error: #F87171;
+
   --background: #0B1220; /* deep ocean */
-  --surface: #111827;
+  --surface: #111827; /* slate-900-ish */
   --text: #F3F4F6;
-  --muted: #9CA3AF;
+  --muted: #D1D5DB; /* gray-300/200 for contrast on dark */
   --border: #1F2937;
+
+  --ring: rgba(147,197,253,0.35); /* blue ring on dark */
+  --ring-strong: rgba(147,197,253,0.55);
 }
 
 /* Layout */
@@ -44,6 +59,17 @@
   padding: 24px 16px;
 }
 
+/* Global focus styles:
+   Use :focus-visible to avoid noisy outlines on mouse.
+   Ensure 3px ring that passes contrast on both themes. */
+:where(a, button, [role="button"], input, select, textarea).focus-visible,
+:where(a, button, [role="button"], input, select, textarea):focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: 0 0 0 3px var(--ring);
+  border-color: var(--primary) !important;
+  transition: box-shadow .2s ease, border-color .2s ease, background .2s ease, color .2s ease;
+}
+
 /* Components */
 .btn {
   display: inline-flex;
@@ -52,19 +78,37 @@
   gap: 8px;
   border: 1px solid var(--primary);
   background: var(--primary);
-  color: #fff;
+  color: var(--primary-contrast);
   padding: 10px 16px;
   border-radius: var(--radius);
   cursor: pointer;
-  transition: transform .1s ease, box-shadow .2s ease, background .2s ease;
+  transition: transform .1s ease, box-shadow .2s ease, background .2s ease, color .2s ease, opacity .2s ease;
   box-shadow: var(--shadow-sm);
   text-decoration: none;
 }
-.btn:hover { box-shadow: var(--shadow-md); opacity: 0.96; }
+.btn:hover { box-shadow: var(--shadow-md); opacity: 0.98; }
 .btn:active { transform: translateY(1px); }
 .btn.secondary {
   background: transparent;
   color: var(--primary);
+  border-color: var(--border);
+}
+.btn[disabled],
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Improve active nav contrast */
+.nav-link.active,
+a.nav-link[aria-current="page"] {
+  color: var(--primary);
+  background: rgba(55,65,81,0.06); /* subtle active bg on light */
+}
+[data-theme="dark"] .nav-link.active,
+[data-theme="dark"] a.nav-link[aria-current="page"] {
+  color: #E5F0FF;
+  background: rgba(147,197,253,0.12); /* subtle active bg on dark */
 }
 
 .input {
@@ -75,11 +119,11 @@
   border-radius: var(--radius);
   padding: 10px 12px;
   outline: none;
-  transition: border-color .2s ease, box-shadow .2s ease;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
 }
 .input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(55,65,81,0.15);
+  box-shadow: 0 0 0 3px var(--ring);
 }
 
 /* Cards / Grid */
@@ -186,3 +230,8 @@
   font-size: 20px;
   font-weight: 700;
 }
+
+/* High contrast helpers for status text */
+.text-muted { color: var(--muted); }
+.text-error { color: var(--error); }
+.text-success { color: var(--success); }

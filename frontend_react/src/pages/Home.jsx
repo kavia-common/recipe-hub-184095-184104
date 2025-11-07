@@ -52,8 +52,8 @@ export default function Home() {
           <FilterPanel initial={{ q }} onChange={handleFiltersChange} collapsible title="Search & Filters" />
         </div>
         <div className="grid-item-3" style={{ gridColumn: 'span 12' }}>
-          {loading && <p style={{ color: 'var(--muted)' }}>Loading...</p>}
-          {error && <p style={{ color: 'var(--error)' }}>{error}</p>}
+          {loading && <p className="text-muted" role="status">Loading...</p>}
+          {error && <p className="text-error" role="alert">{error}</p>}
           {!loading && !error && <RecipeGrid items={recipes} />}
         </div>
       </div>

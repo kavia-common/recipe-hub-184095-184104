@@ -12,12 +12,17 @@ export default function NavBar() {
         <Link to="/" className="brand" aria-label="Recipe Hub Home">
           Recipe Hub
         </Link>
-        <div className="nav-links">
-          <NavLink className="nav-link" to="/">Home</NavLink>
-          <NavLink className="nav-link" to="/search">Search</NavLink>
-          <NavLink className="nav-link" to="/submit">Submit</NavLink>
-          <NavLink className="nav-link" to="/bookmarks">Bookmarks</NavLink>
-          <button className="btn secondary" onClick={toggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+        <div className="nav-links" role="menubar" aria-label="Primary">
+          <NavLink className="nav-link" role="menuitem" to="/">Home</NavLink>
+          <NavLink className="nav-link" role="menuitem" to="/search">Search</NavLink>
+          <NavLink className="nav-link" role="menuitem" to="/submit">Submit</NavLink>
+          <NavLink className="nav-link" role="menuitem" to="/bookmarks">Bookmarks</NavLink>
+          <button
+            className="btn secondary"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
             {theme === 'light' ? '🌙' : '☀️'}
           </button>
         </div>

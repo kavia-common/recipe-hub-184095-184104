@@ -16,7 +16,7 @@ export default function RecipeCard({ recipe }) {
         <button
           className="btn secondary"
           aria-pressed={bookmarked}
-          aria-label={bookmarked ? 'Remove bookmark' : 'Add bookmark'}
+          aria-label={bookmarked ? `Remove bookmark for ${title}` : `Add bookmark for ${title}`}
           onClick={() => toggle(recipe)}
           title={bookmarked ? 'Bookmarked' : 'Bookmark'}
         >
@@ -25,8 +25,13 @@ export default function RecipeCard({ recipe }) {
       </div>
       <p style={{ color: 'var(--muted)', marginBottom: 12 }}>{description}</p>
       <div style={{ display: 'flex', gap: 8 }}>
-        <Link className="btn" to={`/recipe/${id}`}>View Recipe</Link>
-        <button className="btn secondary" onClick={() => toggle(recipe)}>
+        <Link className="btn" to={`/recipe/${id}`} aria-label={`View recipe details for ${title}`}>View Recipe</Link>
+        <button
+          className="btn secondary"
+          onClick={() => toggle(recipe)}
+          aria-pressed={bookmarked}
+          aria-label={bookmarked ? `Remove bookmark for ${title}` : `Add bookmark for ${title}`}
+        >
           {bookmarked ? 'Unbookmark' : 'Bookmark'}
         </button>
       </div>

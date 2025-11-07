@@ -50,7 +50,7 @@ export default function Bookmarks() {
         <h1 className="page-title">Bookmarks</h1>
         <div style={{ display: 'flex', gap: 8 }}>
           {bookmarks.length > 0 && (
-            <Link className="btn secondary" to="/search">Browse more</Link>
+            <Link className="btn secondary" to="/search" aria-label="Browse more recipes">Browse more</Link>
           )}
         </div>
       </div>
@@ -85,10 +85,15 @@ export default function Bookmarks() {
                   {r.description || 'No description.'}
                 </p>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <Link className="btn" to={`/recipe/${r.id}`}>
+                  <Link className="btn" to={`/recipe/${r.id}`} aria-label={`View recipe details for ${r.title}`}>
                     View Recipe
                   </Link>
-                  <Button variant="secondary" onClick={() => remove(r.id)}>
+                  <Button
+                    variant="secondary"
+                    onClick={() => remove(r.id)}
+                    aria-label={`Remove bookmark for ${r.title}`}
+                    title="Remove bookmark"
+                  >
                     Remove
                   </Button>
                 </div>

@@ -79,7 +79,7 @@ export default function RecipeDetail() {
         <div className="page-header">
           <h1 className="page-title">Loading...</h1>
         </div>
-        <p style={{ color: 'var(--muted)' }}>Fetching recipe details.</p>
+        <p className="text-muted">Fetching recipe details.</p>
       </div>
     );
   }
@@ -91,7 +91,7 @@ export default function RecipeDetail() {
           <h1 className="page-title">Recipe</h1>
           <div />
         </div>
-        <p style={{ color: 'var(--error)' }}>{error}</p>
+        <p className="text-error">{error}</p>
       </div>
     );
   }
@@ -102,7 +102,12 @@ export default function RecipeDetail() {
       <div className="page-header">
         <h1 className="page-title">{displayTitle}</h1>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <Button onClick={() => toggle(recipeForBookmark)}>
+          <Button
+            onClick={() => toggle(recipeForBookmark)}
+            aria-pressed={bookmarked}
+            aria-label={bookmarked ? `Remove bookmark for ${displayTitle}` : `Add bookmark for ${displayTitle}`}
+            title={bookmarked ? 'Remove bookmark' : 'Bookmark this recipe'}
+          >
             {bookmarked ? 'Remove Bookmark' : 'Bookmark'}
           </Button>
           <Button
@@ -117,6 +122,8 @@ export default function RecipeDetail() {
                 alert('Link copied to clipboard.');
               }
             }}
+            aria-label={`Share ${displayTitle}`}
+            title="Share"
           >
             Share
           </Button>
@@ -162,7 +169,7 @@ export default function RecipeDetail() {
             gap: 8,
           }}
         >
-          <p style={{ color: 'var(--muted)' }}>{displayDesc}</p>
+          <p className="text-muted">{displayDesc}</p>
           <div
             style={{
               display: 'flex',
