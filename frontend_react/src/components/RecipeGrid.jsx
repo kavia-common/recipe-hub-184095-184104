@@ -2,10 +2,10 @@ import React from 'react';
 import RecipeCard from './RecipeCard';
 
 // PUBLIC_INTERFACE
-export default function RecipeGrid({ items }) {
-  /** Responsive grid to render a list of recipes and empty state. */
+export default function RecipeGrid({ items, emptyContent }) {
+  /** Responsive grid to render a list of recipes with optional custom empty content. */
   if (!items || items.length === 0) {
-    return <p style={{ color: 'var(--muted)' }}>No recipes found.</p>;
+    return emptyContent || <p style={{ color: 'var(--muted)' }}>No recipes found.</p>;
   }
   return (
     <section className="grid" aria-label="Recipes">
