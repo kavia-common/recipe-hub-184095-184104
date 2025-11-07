@@ -1,20 +1,21 @@
 import React from 'react';
 import RecipeGrid from '../components/RecipeGrid';
-
-const saved = [
-  { id: 201, title: 'Coconut Curry', description: 'Comforting and aromatic.' },
-  { id: 202, title: 'Berry Smoothie', description: 'Fresh and energizing.' },
-];
+import { useBookmarks } from '../contexts/BookmarksContext';
 
 // PUBLIC_INTERFACE
 export default function Bookmarks() {
-  /** Bookmarks page with placeholder saved recipes. */
+  /** Bookmarks page showing saved recipes via context. */
+  const { bookmarks } = useBookmarks();
   return (
     <div className="container">
       <div className="page-header">
         <h1 className="page-title">Bookmarks</h1>
       </div>
-      <RecipeGrid items={saved} />
+      {bookmarks.length > 0 ? (
+        <RecipeGrid items={bookmarks} />
+      ) : (
+        <p style={{ color: 'var(--muted)' }}>No bookmarks yet.</p>
+      )}
     </div>
   );
 }

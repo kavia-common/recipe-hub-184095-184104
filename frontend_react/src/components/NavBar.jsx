@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { useTheme } from '../contexts/ThemeContext';
 
 // PUBLIC_INTERFACE
-export default function NavBar({ onToggleTheme, theme }) {
+export default function NavBar() {
   /** Top navigation bar with primary routes and theme toggle. */
+  const { theme, toggleTheme } = useTheme();
   return (
     <nav className="navbar" role="navigation" aria-label="Main navigation">
       <div className="navbar-inner">
@@ -15,7 +17,7 @@ export default function NavBar({ onToggleTheme, theme }) {
           <NavLink className="nav-link" to="/search">Search</NavLink>
           <NavLink className="nav-link" to="/submit">Submit</NavLink>
           <NavLink className="nav-link" to="/bookmarks">Bookmarks</NavLink>
-          <button className="btn secondary" onClick={onToggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+          <button className="btn secondary" onClick={toggleTheme} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
             {theme === 'light' ? '🌙' : '☀️'}
           </button>
         </div>

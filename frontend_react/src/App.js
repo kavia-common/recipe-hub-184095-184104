@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './index.css';
 import './App.css';
 import NavBar from './components/NavBar';
@@ -9,38 +9,35 @@ import Search from './pages/Search';
 import RecipeDetail from './pages/RecipeDetail';
 import SubmitRecipe from './pages/SubmitRecipe';
 import Bookmarks from './pages/Bookmarks';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { BookmarksProvider } from './contexts/BookmarksContext';
+import { RecipesProvider } from './contexts/RecipesContext';
 
 // PUBLIC_INTERFACE
 function App() {
-  /** Root application with routing and theme management. */
-  const [theme, setTheme] = useState('light');
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
-
-  // PUBLIC_INTERFACE
-  const toggleTheme = () => {
-    /** Toggle the current theme between light and dark. */
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
-  };
-
+  /** Root application with routing and global providers. */
   return (
     <BrowserRouter>
-      <div className="app-shell">
-        <NavBar onToggleTheme={toggleTheme} theme={theme} />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/recipe/:id" element={<RecipeDetail />} />
-            <Route path="/submit" element={<SubmitRecipe />} />
-            <Route path="/bookmarks" element={<Bookmarks />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+      <ThemeProvider>
+        <BookmarksProvider>
+          <RecipesProvider>
+            <div className="app-shell">
+              <NavBar />
+              <main className="main-content">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/search" element={<Search />} />
+                  <Route path="/recipe/:id" element={<RecipeDetail />} />
+                  <Route path="/submit" element={<SubmitRecipe />} />
+                  <Route path="/bookmarks" element={<Bookmarks />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+          </RecipesProvider>
+        </BookmarksProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

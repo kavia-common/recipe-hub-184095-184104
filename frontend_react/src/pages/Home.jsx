@@ -1,22 +1,19 @@
 import React from 'react';
 import RecipeGrid from '../components/RecipeGrid';
-
-const sample = [
-  { id: 1, title: 'Ocean Grilled Salmon', description: 'Citrus glaze with herbs.' },
-  { id: 2, title: 'Avocado Toast Deluxe', description: 'Seeded bread with microgreens.' },
-  { id: 3, title: 'Hearty Quinoa Bowl', description: 'Roasted veg and tahini.' },
-  { id: 4, title: 'Classic Margherita', description: 'Crisp crust, fresh basil.' },
-];
+import { useRecipes } from '../contexts/RecipesContext';
 
 // PUBLIC_INTERFACE
 export default function Home() {
-  /** Home page with featured recipe grid. */
+  /** Home page with featured recipe grid from recipes store. */
+  const { recipes, loading, error } = useRecipes();
   return (
     <div className="container">
       <div className="page-header">
         <h1 className="page-title">Featured Recipes</h1>
       </div>
-      <RecipeGrid items={sample} />
+      {loading && <p style={{ color: 'var(--muted)' }}>Loading...</p>}
+      {error && <p style={{ color: 'var(--error)' }}>{error}</p>}
+      {!loading && !error && <RecipeGrid items={recipes} />}
     </div>
   );
 }
