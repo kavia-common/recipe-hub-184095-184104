@@ -1,46 +1,30 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { createRecipesApi } from '../api/recipes';
 
 /**
  * RecipesContext manages recipes list, filters, loading and error states.
- * This is a lightweight client-side store; integrate real API later.
+ * Backed by env-driven API (real or mock).
  */
 const RecipesContext = createContext(undefined);
 
-// Demo initial data mirrors placeholders in pages
-const INITIAL_RECIPES = [
-  { id: 1, title: 'Ocean Grilled Salmon', description: 'Citrus glaze with herbs.' },
-  { id: 2, title: 'Avocado Toast Deluxe', description: 'Seeded bread with microgreens.' },
-  { id: 3, title: 'Hearty Quinoa Bowl', description: 'Roasted veg and tahini.' },
-  { id: 4, title: 'Classic Margherita', description: 'Crisp crust, fresh basil.' },
-];
-
 // PUBLIC_INTERFACE
 export function RecipesProvider({ children }) {
-  /** Provides recipes data, filters, and request states. */
-  const [recipes, setRecipes] = useState(INITIAL_RECIPES);
+  /** Provides recipes data, filters, and request states using the recipes API. */
+  const apiRef = useRef(createRecipesApi());
+  const [recipes, setRecipes] = useState([]);
   const [filters, setFilters] = useState({ q: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Simulated search; replace with backend API call later.
   const fetchRecipes = useCallback(async (query = '') => {
     setLoading(true);
     setError(null);
     try {
-      await new Promise((r) => setTimeout(r, 200)); // simulate latency
-      if (!query) {
-        setRecipes(INITIAL_RECIPES);
-      } else {
-        const ql = query.toLowerCase();
-        const results = INITIAL_RECIPES.filter(
-          (r) =>
-            r.title.toLowerCase().includes(ql) ||
-            r.description.toLowerCase().includes(ql)
-        ).map((r, i) => ({ ...r, id: r.id * 100 + i })); // stable-ish ids for demo
-        setRecipes(results);
-      }
+      const data = await apiRef.current.list({ q: query });
+      setRecipes(Array.isArray(data) ? data : []);
     } catch (e) {
-      setError('Failed to load recipes');
+      const message = e?.message || 'Failed to load recipes';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -51,20 +35,14 @@ export function RecipesProvider({ children }) {
     fetchRecipes('');
   }, [fetchRecipes]);
 
-  const setQuery = useCallback(
-    (q) => {
-      setFilters((prev) => ({ ...prev, q }));
-    },
-    [setFilters]
-  );
+  const setQuery = useCallback((q) => {
+    setFilters((prev) => ({ ...prev, q }));
+  }, []);
 
-  const search = useCallback(
-    (q) => {
-      setQuery(q);
-      return fetchRecipes(q);
-    },
-    [fetchRecipes, setQuery]
-  );
+  const search = useCallback((q) => {
+    setQuery(q);
+    return fetchRecipes(q);
+  }, [fetchRecipes, setQuery]);
 
   const value = useMemo(
     () => ({ recipes, filters, setQuery, search, loading, error }),
