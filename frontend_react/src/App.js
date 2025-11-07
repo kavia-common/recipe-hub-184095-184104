@@ -1,48 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
+import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
+import './index.css';
 import './App.css';
+import NavBar from './components/NavBar';
+import Footer from './components/Footer';
+import Home from './pages/Home';
+import Search from './pages/Search';
+import RecipeDetail from './pages/RecipeDetail';
+import SubmitRecipe from './pages/SubmitRecipe';
+import Bookmarks from './pages/Bookmarks';
 
 // PUBLIC_INTERFACE
 function App() {
+  /** Root application with routing and theme management. */
   const [theme, setTheme] = useState('light');
 
-  // Effect to apply theme to document element
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
   // PUBLIC_INTERFACE
   const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+    /** Toggle the current theme between light and dark. */
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <button 
-          className="theme-toggle" 
-          onClick={toggleTheme}
-          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-        >
-          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-        </button>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <p>
-          Current theme: <strong>{theme}</strong>
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <div className="app-shell">
+        <NavBar onToggleTheme={toggleTheme} theme={theme} />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/recipe/:id" element={<RecipeDetail />} />
+            <Route path="/submit" element={<SubmitRecipe />} />
+            <Route path="/bookmarks" element={<Bookmarks />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </BrowserRouter>
   );
 }
 
