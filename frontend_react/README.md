@@ -1,82 +1,118 @@
-# Lightweight React Template for KAVIA
+# Recipe Hub – Frontend (React)
 
-This project provides a minimal React template with a clean, modern UI and minimal dependencies.
+Minimal, production-minded React app for browsing, searching, viewing, submitting, and bookmarking recipes. It supports mock data or a real backend via environment variables, with a small env utility to keep configuration centralized.
 
-## Features
+## Quick Start
 
-- **Lightweight**: No heavy UI frameworks - uses only vanilla CSS and React
-- **Modern UI**: Clean, responsive design with KAVIA brand styling
-- **Fast**: Minimal dependencies for quick loading times
-- **Simple**: Easy to understand and modify
+- Development: `npm start` then open http://localhost:3000
+- Tests: `npm test`
+- Production build: `npm run build`
 
-## Getting Started
+Preview notes:
+- The app runs on port 3000 in dev. Make sure nothing else is listening on 3000.
 
-In the project directory, you can run:
+## Environment and Configuration
 
-### `npm start`
+All runtime configuration is read from environment variables that must be prefixed with REACT_APP_. This project centralizes env access in `src/utils/env.js`.
 
-Runs the app in development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Core variables supported:
+- REACT_APP_API_BASE: Base path or URL for API, e.g. `/api` or `http://localhost:4000/api`
+- REACT_APP_BACKEND_URL: Full backend URL; if set, it takes precedence over REACT_APP_API_BASE
+- REACT_APP_LOG_LEVEL: App log level string (e.g., `debug`, `info`, `warn`, `error`). Default: `info`
+- REACT_APP_NODE_ENV: Explicit runtime env override; falls back to `process.env.NODE_ENV`. Expected values: `development`, `production`, `test`
+- REACT_APP_FEATURE_FLAGS: Optional CSV/JSON of feature flags (not currently enforced in code, but reserved for future toggles)
 
-### `npm test`
+Also present (from the container .env): 
+REACT_APP_FRONTEND_URL, REACT_APP_WS_URL, REACT_APP_NEXT_TELEMETRY_DISABLED, REACT_APP_ENABLE_SOURCE_MAPS, REACT_APP_PORT, REACT_APP_TRUST_PROXY, REACT_APP_HEALTHCHECK_PATH, REACT_APP_EXPERIMENTS_ENABLED. These are not required by the current UI but remain available for platform deployment consistency.
 
-Launches the test runner in interactive watch mode.
+Recommended: see .env.example (if present in project root or this folder) for a sample of typical variables.
 
-### `npm run build`
+### How env.js works
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+src/utils/env.js exposes:
+- getEnv(): returns { apiBase, backendUrl, nodeEnv, logLevel, useMock }
+- isProduction(): boolean
+- getApiBaseUrl(): resolves the effective base URL by preferring REACT_APP_BACKEND_URL over REACT_APP_API_BASE and normalizes trailing slashes
 
-## Customization
+Mock-vs-Real switching logic:
+- If both REACT_APP_API_BASE and REACT_APP_BACKEND_URL are unset AND the environment is not production, `useMock` becomes true and the app uses local mock data.
+- If either REACT_APP_API_BASE or REACT_APP_BACKEND_URL is set, the app uses the real HTTP client pointing at that base.
 
-### Colors
+You can inspect usage at:
+- src/api/recipes.js: calls `getEnv()`; `useMock` selects between mock API (`src/mocks/mockApi.js`) and real client (`src/api/client.js`)
+- src/api/client.js: uses `getApiBaseUrl()` to bind fetch calls to the configured backend
+- src/pages/SubmitRecipe.jsx: uses `getApiBaseUrl()` to show whether you’re using a real API or mock mode
 
-The main brand colors are defined as CSS variables in `src/App.css`:
+This ensures there is a single source of truth for environment configuration.
 
-```css
-:root {
-  --kavia-orange: #E87A41;
-  --kavia-dark: #1A1A1A;
-  --text-color: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --border-color: rgba(255, 255, 255, 0.1);
-}
-```
+## Using Mock Mode
 
-### Components
+When REACT_APP_API_BASE and REACT_APP_BACKEND_URL are not provided (and not production), the app automatically:
+- Serves recipe data from `src/mocks/recipes.sample.json`
+- Simulates latency (~250ms) for realism
+- Persists created recipes only in memory (lost on refresh)
 
-This template uses pure HTML/CSS components instead of a UI framework. You can find component styles in `src/App.css`. 
+To deliberately use mock mode in development, leave both REACT_APP_API_BASE and REACT_APP_BACKEND_URL unset.
 
-Common components include:
-- Buttons (`.btn`, `.btn-large`)
-- Container (`.container`)
-- Navigation (`.navbar`)
-- Typography (`.title`, `.subtitle`, `.description`)
+To confirm mock mode:
+- The Submit page shows: “No API configured. Using local mock store; your recipe will persist until refresh.”
+- Network panel won’t show outgoing requests to a backend
 
-## Learn More
+## Using a Real Backend
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Set one of the following:
+- REACT_APP_BACKEND_URL=https://your-backend.example.com (preferred)
+- OR REACT_APP_API_BASE=/api (if your dev server proxies to a backend)
 
-### Code Splitting
+The app will:
+- Use the HTTP client (`src/api/client.js`) to call `${base}/recipes`, `${base}/recipes/:id`, etc.
+- Treat HTTP errors with simple error messages surfaced in UI
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Notes:
+- REACT_APP_BACKEND_URL takes precedence if both are supplied.
+- Ensure CORS is configured on your backend or use a dev proxy if using a different host/port.
 
-### Analyzing the Bundle Size
+## .env example
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Example values for local development:
 
-### Making a Progressive Web App
+REACT_APP_NODE_ENV=development
+REACT_APP_LOG_LEVEL=debug
+# Leave the two below empty to use mock mode:
+# REACT_APP_BACKEND_URL=
+# REACT_APP_API_BASE=
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+# If you have a real backend, uncomment and set one of these:
+# REACT_APP_BACKEND_URL=http://localhost:4000
+# REACT_APP_API_BASE=/api
 
-### Advanced Configuration
+You can create a `.env` file at the project root or within this folder (depending on your tooling). Do not commit real secrets. For CRA, environment variables are embedded at build time.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Project Structure Highlights
 
-### Deployment
+- src/utils/env.js: single source of truth for env/config
+- src/api/client.js: minimal fetch wrapper using getApiBaseUrl()
+- src/api/recipes.js: selects mock or real API based on env
+- src/mocks/mockApi.js: mock dataset and endpoints
+- src/contexts/*.jsx: app state (Theme, Recipes, Bookmarks)
+- src/pages/*.jsx: pages (Home, Search, Detail, Submit, Bookmarks)
+- src/components/*: presentational/reusable components
+- src/App.css: Ocean Professional minimalist theme
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Accessibility and Theme
 
-### `npm run build` fails to minify
+- Light/dark theme toggle via ThemeContext
+- Focus-visible outlines, semantic ARIA labels, and accessible components
+- Minimalist Ocean Professional style in App.css
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Development and Preview
+
+- Start: `npm start` -> http://localhost:3000
+- In dev, if REACT_APP_API_BASE/REACT_APP_BACKEND_URL are not set, mock mode is active.
+- In production builds where both are missing, `useMock` is false by design—set a backend URL for real deployments.
+
+## Troubleshooting
+
+- 404s or CORS errors: verify REACT_APP_BACKEND_URL/REACT_APP_API_BASE and backend CORS/proxy settings
+- App still in mock mode: check that at least one of REACT_APP_BACKEND_URL or REACT_APP_API_BASE is set and that you’ve restarted the dev server after env changes
+- Port conflicts on 3000: stop the other process or change the dev server port
